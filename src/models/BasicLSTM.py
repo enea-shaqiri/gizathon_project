@@ -17,11 +17,10 @@ class BasicLSTM(nn.Module):
         # internal state
         c_0 = Variable(torch.zeros(self.lstm.num_layers, x.shape[0], self.lstm.hidden_size)).to(dtype=x.dtype, device=x.device)
         output, (hn, cn) = self.lstm(x, (h_0, c_0))
-        out = hn.view(-1, self.lstm.hidden_size)
-        #out = torch.relu(out)
-        out = self.fc(out)
-        #out = torch.relu(out)
-        return out
+        output = output[:, -1]
+        output = torch.relu(output)
+        output = self.fc(output)
+        return output
 
     def init_weights(self):
         for m in self.modules():
