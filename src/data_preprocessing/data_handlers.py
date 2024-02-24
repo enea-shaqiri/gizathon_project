@@ -36,5 +36,5 @@ def create_rolling_features(df):
             df[f"rolling{window}_{col}_quantile75"] = df[col].rolling(window).quantile(0.75)
     df.dropna(inplace=True)
     rolling_columns = [col for col in df.columns if "rolling" in col]
-    return df[["date"] + rolling_columns]
+    return df[["date"] + ["price actual"] + rolling_columns]
 
