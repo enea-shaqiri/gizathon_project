@@ -1,9 +1,11 @@
 import os.path
 
 import numpy as np
-#from giza_actions.action import Action, action
+from giza_actions.action import Action, action
+from giza_actions.task import task
 import torch
 from dotenv import load_dotenv, find_dotenv
+from config.lstm_config import configs
 
 from src.data_preprocessing.baseline_lstm_preprocessing import get_train_test
 from src.data_preprocessing.data_handlers import load_data
@@ -15,7 +17,7 @@ device = "cpu"
 if has_cuda:
     device = "cuda"
 
-#@task(name='Convert To ONNX')
+@task(name='Convert To ONNX')
 def convert_to_onnx(model, input_size, filename):
     dummy_input = torch.randn(1, input_size).unsqueeze(-1).to(device, dtype=torch.float64)
     path = os.path.join(os.environ["ONNX_DIR"], filename)
@@ -24,7 +26,7 @@ def convert_to_onnx(model, input_size, filename):
                       dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},)
     print(f"Model has been converted to ONNX and saved as {path}")
 
-#@task(name="Training!")
+@task(name="Training!")
 def train(model, train_loader, valid_loader, criterion, optimizer, n_epochs):
     best_loss, patience, valid_losses, train_losses, best_model = np.inf, 0, [], [], None
     for epoch in range(n_epochs):
@@ -62,22 +64,25 @@ def train(model, train_loader, valid_loader, criterion, optimizer, n_epochs):
             return best_model, train_losses, valid_losses
     return best_model, train_losses, valid_losses
 
-#@action(name="Train LSTM")
-def main(input_size, n_features=1, hidden_size=8, n_epochs=40, lr=0.001, batch_size=16, filename="lstm_model.onnx"):
+
+@action(name="Train LSTM", log_prints=True)
+def main():
     df = load_data()
-    X_train, y_train, X_valid, y_valid, X_test, y_test = get_train_test(df, window=input_size)
-    model = BasicLSTM(n_features, hidden_size)
+    X_train, y_train, X_valid, y_valid, X_test, y_test = get_train_test(df, window=configs["input_size"])
+    model = BasicLSTM(configs["n_features"], configs["hidden_size"])
     model.to(device)
     criterion = torch.nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=configs["lr"])
     train_dataset = TensorDataset(torch.from_numpy(X_train), torch.from_numpy(y_train))
     valid_dataset = TensorDataset(torch.from_numpy(X_valid), torch.from_numpy(y_valid))
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False)
-    valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=False)
-    best_model, train_losses, valid_losses = train(model, train_loader, valid_loader, criterion, optimizer, n_epochs)
-    convert_to_onnx(best_model, input_size, filename)
+    train_loader = DataLoader(train_dataset, batch_size=configs["batch_size"], shuffle=False)
+    valid_loader = DataLoader(valid_dataset, batch_size=configs["batch_size"], shuffle=False)
+    best_model, train_losses, valid_losses = train(model, train_loader, valid_loader, criterion, optimizer, configs["n_epochs"])
+    convert_to_onnx(best_model, configs["input_size"], configs["filename"])
 
 
 
 if __name__ == "__main__":
-    main(24, n_epochs=800)
+    #action_deploy = Action(entrypoint=main, name="lstm")
+    #action_deploy.serve(name="lstm")
+    main()
