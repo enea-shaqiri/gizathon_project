@@ -1,30 +1,33 @@
 import os.path
 
 import numpy as np
-#from giza_actions.action import Action, action
+from giza_actions.action import Action, action
+from giza_actions.task import task
 import torch
+from torch.utils.data import DataLoader, TensorDataset
 from dotenv import load_dotenv, find_dotenv
 
-from src.data_preprocessing.fc_preprocessing import get_train_test
+from config.fc_config import configs
+from src.data_preprocessing.fc_preprocessing import get_train_test_task
 from src.data_preprocessing.data_handlers import load_data
 from src.models.BasicFC import BasicFC
-from torch.utils.data import DataLoader, TensorDataset
+
 has_cuda = torch.cuda.is_available()
 load_dotenv(find_dotenv())
 device = "cpu"
 if has_cuda:
     device = "cuda"
 
-#@task(name='Convert To ONNX')
+@task(name='Convert To ONNX')
 def convert_to_onnx(model, input_size, filename):
-    dummy_input = torch.randn(1, input_size).to(device, dtype=torch.float64)
+    dummy_input = torch.randn(1, input_size).to(device, dtype=torch.float32)
     path = os.path.join(os.environ["ONNX_DIR"], filename)
     torch.onnx.export(model, dummy_input, path, export_params=True, opset_version=10,
                       do_constant_folding=True, input_names=["input"], output_names=["output"],
                       dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}}, )
     print(f"Model has been converted to ONNX and saved as {path}")
 
-#@task(name="Training!")
+@task(name="Training!")
 def train(model, train_loader, valid_loader, criterion, optimizer, n_epochs):
     best_loss, patience, valid_losses, train_losses, best_model = np.inf, 0, [], [], None
     for epoch in range(n_epochs):
@@ -61,22 +64,22 @@ def train(model, train_loader, valid_loader, criterion, optimizer, n_epochs):
             return best_model, train_losses, valid_losses
     return best_model, train_losses, valid_losses
 
-#@action(name="Train Fully Connected")
-def main(lookback_window, hidden_size_1, hidden_size_2, hidden_size_3, n_epochs=40, lr=0.001, batch_size=16, filename="fc_model.onnx"):
+@action(name="Train Fully Connected", log_prints=True)
+def main():
     df = load_data()
-    X_train, y_train, X_valid, y_valid, X_test, y_test = get_train_test(df, window=lookback_window)
-    model = BasicFC(len(X_train[0]), hidden_size_1, hidden_size_2, hidden_size_3)
+    X_train, y_train, X_valid, y_valid, X_test, y_test = get_train_test_task(df, window=configs["lookback_window"])
+    model = BasicFC(len(X_train[0]), configs["hidden_size_1"], configs["hidden_size_2"], configs["hidden_size_3"])
     model.to(device)
     criterion = torch.nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=configs["lr"])
     train_dataset = TensorDataset(torch.from_numpy(X_train), torch.from_numpy(y_train))
     valid_dataset = TensorDataset(torch.from_numpy(X_valid), torch.from_numpy(y_valid))
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False)
-    valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=False)
-    best_model, train_losses, valid_losses = train(model, train_loader, valid_loader, criterion, optimizer, n_epochs)
-    convert_to_onnx(best_model, len(X_train[0]), filename)
+    train_loader = DataLoader(train_dataset, batch_size=configs["batch_size"], shuffle=False)
+    valid_loader = DataLoader(valid_dataset, batch_size=configs["batch_size"], shuffle=False)
+    best_model, train_losses, valid_losses = train(model, train_loader, valid_loader, criterion, optimizer, configs["n_epochs"])
+    convert_to_onnx(best_model, len(X_train[0]), configs["filename"])
 
 
 
 if __name__ == "__main__":
-    main(lookback_window=12, hidden_size_1=128, hidden_size_2=64, hidden_size_3=32, n_epochs=100)
+    main()

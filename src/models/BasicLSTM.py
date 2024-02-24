@@ -7,8 +7,8 @@ from torch.autograd import Variable
 class BasicLSTM(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers=1):
         super(BasicLSTM, self).__init__()
-        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers, batch_first=True).double()
-        self.fc = nn.Linear(hidden_size, 1).double()
+        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers, batch_first=True)
+        self.fc = nn.Linear(hidden_size, 1)
         self.init_weights()
 
     def forward(self, x):

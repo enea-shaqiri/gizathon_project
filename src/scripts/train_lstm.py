@@ -7,7 +7,7 @@ import torch
 from dotenv import load_dotenv, find_dotenv
 from config.lstm_config import configs
 
-from src.data_preprocessing.baseline_lstm_preprocessing import get_train_test
+from src.data_preprocessing.baseline_lstm_preprocessing import get_train_test_task
 from src.data_preprocessing.data_handlers import load_data
 from src.models.BasicLSTM import BasicLSTM
 from torch.utils.data import DataLoader, TensorDataset
@@ -19,7 +19,7 @@ if has_cuda:
 
 @task(name='Convert To ONNX')
 def convert_to_onnx(model, input_size, filename):
-    dummy_input = torch.randn(1, input_size).unsqueeze(-1).to(device, dtype=torch.float64)
+    dummy_input = torch.randn(1, input_size).unsqueeze(-1).to(device, dtype=torch.float32)
     path = os.path.join(os.environ["ONNX_DIR"], filename)
     torch.onnx.export(model, dummy_input, path, export_params=True, opset_version=10,
                       do_constant_folding=True, input_names=["input"], output_names=["output"],
@@ -68,7 +68,7 @@ def train(model, train_loader, valid_loader, criterion, optimizer, n_epochs):
 @action(name="Train LSTM", log_prints=True)
 def main():
     df = load_data()
-    X_train, y_train, X_valid, y_valid, X_test, y_test = get_train_test(df, window=configs["input_size"])
+    X_train, y_train, X_valid, y_valid, X_test, y_test = get_train_test_task(df, window=configs["input_size"])
     model = BasicLSTM(configs["n_features"], configs["hidden_size"])
     model.to(device)
     criterion = torch.nn.MSELoss()

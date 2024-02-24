@@ -7,10 +7,10 @@ from torch.autograd import Variable
 class BasicFC(nn.Module):
     def __init__(self, input_size, hidden_size_1, hidden_size_2, hidden_size_3):
         super(BasicFC, self).__init__()
-        self.fc_1 = nn.Linear(input_size, hidden_size_1).double()
-        self.fc_2 = nn.Linear(hidden_size_1, hidden_size_2).double()
-        self.fc_3 = nn.Linear(hidden_size_2, hidden_size_3).double()
-        self.fc_4 = nn.Linear(hidden_size_3, 1).double()
+        self.fc_1 = nn.Linear(input_size, hidden_size_1)
+        self.fc_2 = nn.Linear(hidden_size_1, hidden_size_2)
+        self.fc_3 = nn.Linear(hidden_size_2, hidden_size_3)
+        self.fc_4 = nn.Linear(hidden_size_3, 1)
         self.dropout = nn.Dropout(p=0.8)
         self.init_weights()
 
