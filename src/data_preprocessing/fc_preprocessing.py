@@ -1,25 +1,9 @@
 import numpy as np
 import pandas as pd
 from giza_actions.task import task
-from src.data_preprocessing.data_handlers import load_data
+from src.data_preprocessing.data_handlers import create_date_features
 
 
-def create_date_features(df):
-    months, days, hours = [], [], []
-    s = pd.to_datetime(df.date)
-    # Not using pd.to_datetime as it works with utc timezone.
-    for j in range(len(s)):
-        months.append(s.iloc[j].month)
-        days.append(s.iloc[j].day)
-        hours.append(s.iloc[j].hour)
-    df["month"] = months
-    df["day"] = days
-    df["hour"] = hours
-    df.drop(columns=["date"], inplace=True)
-    return df
-
-
-#@task(name="Get train test split for FC")
 def get_train_test(df, window=12, train_size=0.8):
     """
     It returns train, validation and test data.
@@ -41,3 +25,7 @@ def get_train_test(df, window=12, train_size=0.8):
     y_test = y[int(len(y) * train_size) + valid_size:]
     return x_train, y_train, x_valid, y_valid, x_test, y_test
 
+
+@task(name="Get train test split for FC")
+def get_train_test_task(df, window=12, train_size=0.8):
+    return get_train_test(df, window, train_size)

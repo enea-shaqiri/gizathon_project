@@ -3,7 +3,6 @@ from giza_actions.task import task
 from src.data_preprocessing.data_handlers import load_data
 
 
-#@task(name="Get train test split for LSTM")
 def get_train_test(df, window=24, train_size=0.8):
     """
     It returns train, validation and test data.
@@ -23,4 +22,7 @@ def get_train_test(df, window=24, train_size=0.8):
     y_test = y[int(len(y) * train_size) + valid_size:]
     return x_train, y_train, x_valid, y_valid, x_test, y_test
 
+@task(name="Get train test split for LSTM")
+def get_train_test_task(df, window=24, train_size=0.8):
+    return get_train_test(df, window, train_size)
 
