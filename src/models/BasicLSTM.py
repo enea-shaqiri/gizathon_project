@@ -26,6 +26,6 @@ class BasicLSTM(nn.Module):
         for m in self.modules():
             if isinstance(m, nn.Linear):
                 nn.init.xavier_uniform_(m.weight)
-                nn.init.constant_(m.bias, 30)
+                nn.init.constant_(m.bias, 33)
 
 
