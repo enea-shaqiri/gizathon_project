@@ -1,4 +1,5 @@
-For this hackhathon we want to leverage the Giza stack to build a verifiable model for predicting electricity prices.  
+# Project
+For this hackhathon we want to leverage the Giza stack to build a verifiable model for predicting electricity prices.
 
 Being able to accurately predict the price of energy is an important problem in the real world, with significant
 impact on energy prices for consumers and grid efficiency. There is also a big market for this type of forecasts,
@@ -22,6 +23,11 @@ We built and run several different models for the forecasting problem. The choic
 data and the resources available (so a middle ground between decent performance and simplicity). We use a LSTM model, 
 a Fully connected model and a Random Forest model. The target is the same for all models, but each model is embedded in a 
 different pipeline, as the pre-processing steps are different for each one of them.
+
+# Results
+The results can be found in the notebook `Results`. We see that the LSTM model has decent performances, but we could not 
+transpile it, as it is not currently supported. The only model we could transpile was the fully connected one, which happens
+to have the worst performance!
 
 # Avenues for improvements
 Additional pre-processing and normalization of features. Normalization is not necessary for random forests,
