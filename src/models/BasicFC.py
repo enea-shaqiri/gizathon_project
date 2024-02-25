@@ -9,28 +9,18 @@ class BasicFC(nn.Module):
         super(BasicFC, self).__init__()
         self.fc_1 = nn.Linear(input_size, hidden_size_1)
         self.fc_2 = nn.Linear(hidden_size_1, hidden_size_1)
-        self.fc_3 = nn.Linear(hidden_size_1, hidden_size_1)
-        self.fc_4 = nn.Linear(hidden_size_1, hidden_size_2)
-        self.fc_5 = nn.Linear(hidden_size_2, hidden_size_2)
-        self.fc_6 = nn.Linear(hidden_size_2, hidden_size_2)
-        self.fc_7 = nn.Linear(hidden_size_2, hidden_size_3)
-        self.fc_8 = nn.Linear(hidden_size_3, hidden_size_3)
-        self.fc_9 = nn.Linear(hidden_size_3, hidden_size_3)
-        self.fc_10 = nn.Linear(hidden_size_3, 1)
+        self.fc_3 = nn.Linear(hidden_size_1, hidden_size_2)
+        self.fc_4 = nn.Linear(hidden_size_2, hidden_size_3)
+        self.fc_5 = nn.Linear(hidden_size_3, 1)
         self.dropout = nn.Dropout(p=0.1)
         self.init_weights()
 
     def forward(self, x):
-        output = self.dropout(torch.relu(self.fc_1(x)))
+        output = torch.relu(self.fc_1(x))
         output = self.dropout(torch.relu(self.fc_2(output)))
         output = self.dropout(torch.relu(self.fc_3(output)))
         output = self.dropout(torch.relu(self.fc_4(output)))
-        output = self.dropout(torch.relu(self.fc_5(output)))
-        output = self.dropout(torch.relu(self.fc_6(output)))
-        output = self.dropout(torch.relu(self.fc_7(output)))
-        output = self.dropout(torch.relu(self.fc_8(output)))
-        output = self.dropout(torch.relu(self.fc_9(output)))
-        output = self.fc_10(output)
+        output = self.fc_5(output)
         return output
 
     def init_weights(self):
