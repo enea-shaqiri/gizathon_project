@@ -1,4 +1,4 @@
-# Project
+# Summary
 For this hackhathon we want to leverage the Giza stack to build a verifiable model for predicting electricity prices.
 
 Being able to accurately predict the price of energy is an important problem in the real world, with significant
