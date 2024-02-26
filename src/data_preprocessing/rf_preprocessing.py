@@ -1,7 +1,7 @@
 from warnings import simplefilter
 import pandas as pd
 
-from src.data_preprocessing.data_handlers import create_date_features, create_rolling_features
+from gizathon_project.src.data_preprocessing.data_handlers import create_date_features, create_rolling_features
 import numpy as np
 from giza_actions.task import task
 simplefilter(action="ignore", category=pd.errors.PerformanceWarning)

@@ -10,8 +10,8 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 
 from config.rf_config import configs
-from src.data_preprocessing.data_handlers import load_data
-from src.data_preprocessing.rf_preprocessing import get_train_test_task
+from gizathon_project.src.data_preprocessing.data_handlers import load_data
+from gizathon_project.src.data_preprocessing.rf_preprocessing import get_train_test_task
 
 load_dotenv(find_dotenv())
 

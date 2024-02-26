@@ -1,6 +1,5 @@
 import numpy as np
 from giza_actions.task import task
-from src.data_preprocessing.data_handlers import load_data
 
 
 def get_train_test(df, window=24, train_size=0.8):

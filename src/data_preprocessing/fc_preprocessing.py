@@ -1,7 +1,6 @@
 import numpy as np
-import pandas as pd
 from giza_actions.task import task
-from src.data_preprocessing.data_handlers import create_date_features
+from gizathon_project.src.data_preprocessing.data_handlers import create_date_features
 
 
 def get_train_test(df, window=12, train_size=0.8):

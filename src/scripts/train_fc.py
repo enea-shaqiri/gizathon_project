@@ -8,9 +8,9 @@ from torch.utils.data import DataLoader, TensorDataset
 from dotenv import load_dotenv, find_dotenv
 
 from config.fc_config import configs
-from src.data_preprocessing.fc_preprocessing import get_train_test_task
-from src.data_preprocessing.data_handlers import load_data
-from src.models.BasicFC import BasicFC
+from gizathon_project.src.data_preprocessing.fc_preprocessing import get_train_test_task
+from gizathon_project.src.data_preprocessing.data_handlers import load_data
+from gizathon_project.src.models.BasicFC import BasicFC
 
 has_cuda = torch.cuda.is_available()
 load_dotenv(find_dotenv())
@@ -37,6 +37,8 @@ def train(model, train_loader, valid_loader, criterion, optimizer, n_epochs):
             outputs = model.forward(X_batch.to(device)).squeeze()
             optimizer.zero_grad()
             loss = criterion(outputs, y_batch.to(device))
+            if outputs[0] == outputs[1] == outputs[2]:
+                pass
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
@@ -45,6 +47,8 @@ def train(model, train_loader, valid_loader, criterion, optimizer, n_epochs):
         with torch.no_grad():
             for X_batch, y_batch in valid_loader:
                 outputs = model(X_batch.to(device)).squeeze()
+                if len(outputs.shape) == 0:
+                    y_batch = y_batch[0]
                 loss = criterion(outputs, y_batch.to(device))
                 valid_loss += loss.item()
         running_loss /= len(train_loader)
@@ -59,7 +63,7 @@ def train(model, train_loader, valid_loader, criterion, optimizer, n_epochs):
         else:
             patience += 1
         # Stop after 4 epochs without validation loss improvement
-        if patience >= 4:
+        if patience >= 20:
             print("Early stopping")
             return best_model, train_losses, valid_losses
     return best_model, train_losses, valid_losses
@@ -71,7 +75,7 @@ def main():
     model = BasicFC(len(X_train[0]), configs["hidden_size_1"], configs["hidden_size_2"], configs["hidden_size_3"])
     model.to(device)
     criterion = torch.nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=configs["lr"])
+    optimizer = torch.optim.Adam(model.parameters(), lr=configs["lr"], weight_decay=1e-5)
     train_dataset = TensorDataset(torch.from_numpy(X_train), torch.from_numpy(y_train))
     valid_dataset = TensorDataset(torch.from_numpy(X_valid), torch.from_numpy(y_valid))
     train_loader = DataLoader(train_dataset, batch_size=configs["batch_size"], shuffle=False)

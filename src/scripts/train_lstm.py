@@ -7,9 +7,9 @@ import torch
 from dotenv import load_dotenv, find_dotenv
 from config.lstm_config import configs
 
-from src.data_preprocessing.baseline_lstm_preprocessing import get_train_test_task
-from src.data_preprocessing.data_handlers import load_data
-from src.models.BasicLSTM import BasicLSTM
+from gizathon_project.src.data_preprocessing.baseline_lstm_preprocessing import get_train_test_task
+from gizathon_project.src.data_preprocessing.data_handlers import load_data
+from gizathon_project.src.models.BasicLSTM import BasicLSTM
 from torch.utils.data import DataLoader, TensorDataset
 has_cuda = torch.cuda.is_available()
 load_dotenv(find_dotenv())
@@ -72,7 +72,7 @@ def main():
     model = BasicLSTM(configs["n_features"], configs["hidden_size"])
     model.to(device)
     criterion = torch.nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=configs["lr"])
+    optimizer = torch.optim.Adam(model.parameters(), lr=configs["lr"], weight_decay=1e-5)
     train_dataset = TensorDataset(torch.from_numpy(X_train), torch.from_numpy(y_train))
     valid_dataset = TensorDataset(torch.from_numpy(X_valid), torch.from_numpy(y_valid))
     train_loader = DataLoader(train_dataset, batch_size=configs["batch_size"], shuffle=False)
