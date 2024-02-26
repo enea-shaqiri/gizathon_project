@@ -36,3 +36,7 @@ but it helps improve the training of the deep learning models.
 * Hyperparameter search. All the models used have several hyperparameters. We tried some combinations of hyperparameters, 
 but a more thorough search would likely improve the results.
 
+
+If you are wondering why I am using the "we" pronoun as a solo hacker, here is the reason 
+https://math.stackexchange.com/questions/1305775/why-do-single-author-math-papers-use-we-instead-of-i (my background is in Math)
+
